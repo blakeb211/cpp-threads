@@ -2,9 +2,9 @@
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <thread>
 #include <vector>
-#include <string>
 // Tasks
 // Threads
 // 	can accesss different memory locations concurrently with no issues
@@ -37,30 +37,33 @@ int main()
 	return 0;
 }
 
-struct GameState {
+struct GameState
+{
 	std::vector<int> vertices{};
 };
 
 void Test3()
 {
+	std::cout << "\nMain Thread(" << std::this_thread::get_id() << ") started\n";
 	using namespace std::chrono_literals;
 	std::atomic<int> progress{0};
 	GameState level{};
 
 	auto load = [&progress, &level]() {
+		std::cout << "\nLoader Thread(" << std::this_thread::get_id() << ") started\n";
 		level.vertices.resize(40'000);
 		level.vertices.resize(0);
 		while (progress < 1000)
 		{
 			level.vertices.push_back(progress);
-			progress += 1;
+			progress += 2;
 			std::this_thread::sleep_for(1ms);
 		}
+		std::cout << "\nLoader Thread(" << std::this_thread::get_id() << ") ended\n";
 	};
 
 	std::cout << "Loading level\n";
 	std::thread t1{load};
-	t1.detach();
 
 	for (;;)
 	{
@@ -69,11 +72,13 @@ void Test3()
 		std::cout << ".";
 		if (progress == 1000)
 		{
+			t1.join();
 			break;
 		}
 	}
 	std::cout << std::endl;
 	std::cout << "Level loaded with " << level.vertices.size() << " vertices." << std::endl;
+	std::cout << "\nMain Thread(" << std::this_thread::get_id() << ") ended\n";
 }
 
 void Test1()
