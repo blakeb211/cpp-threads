@@ -4,7 +4,7 @@
 #include <memory>
 #include <thread>
 #include <vector>
-
+#include <string>
 // Tasks
 // Threads
 // 	can accesss different memory locations concurrently with no issues
@@ -37,33 +37,45 @@ int main()
 	return 0;
 }
 
+struct GameState {
+	std::vector<int> vertices{};
+};
+
 void Test3()
 {
 	using namespace std::chrono_literals;
 	std::atomic<int> progress{0};
+	GameState level{};
 
-	auto load = [&]() {
+	auto load = [&progress, &level]() {
+		level.vertices.resize(40'000);
+		level.vertices.resize(0);
 		while (progress < 1000)
 		{
-			progress += 10;
-			std::this_thread::sleep_for(3ms);
+			level.vertices.push_back(progress);
+			progress += 1;
+			std::this_thread::sleep_for(1ms);
 		}
 	};
 
+	const std::string prog_txt{"."};
+	std::cout << "Loading level\n";
 	std::thread t1{load};
+	t1.detach();
+
 	for (;;)
 	{
-		if (progress % 50 == 0)
-		{
-			std::cout << "progress: " << progress << std::endl;
-		}
-		std::this_thread::sleep_for(50us);
+		// GetUserInput();
+		std::this_thread::sleep_for(16ms);
+		if (progress % 2 == 0)
+			std::cout << prog_txt;
 		if (progress == 1000)
 		{
-			t1.join();
 			break;
 		}
 	}
+	std::cout << std::endl;
+	std::cout << "Level loaded with " << level.vertices.size() << " vertices." << std::endl;
 }
 
 void Test1()
