@@ -66,8 +66,7 @@ void Test3()
 	{
 		// GetUserInput();
 		std::this_thread::sleep_for(16ms);
-		if (progress % 2 == 0)
-			std::cout << ".";
+		std::cout << ".";
 		if (progress == 1000)
 		{
 			break;
