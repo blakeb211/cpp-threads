@@ -58,7 +58,6 @@ void Test3()
 		}
 	};
 
-	const std::string prog_txt{"."};
 	std::cout << "Loading level\n";
 	std::thread t1{load};
 	t1.detach();
@@ -68,7 +67,7 @@ void Test3()
 		// GetUserInput();
 		std::this_thread::sleep_for(16ms);
 		if (progress % 2 == 0)
-			std::cout << prog_txt;
+			std::cout << ".";
 		if (progress == 1000)
 		{
 			break;
